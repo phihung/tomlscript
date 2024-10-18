@@ -1,0 +1,39 @@
+{
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit"
+    }
+  },
+  "notebook.formatOnSave.enabled": true,
+  "notebook.codeActionsOnSave": {
+    // "notebook.source.fixAll": "explicit",
+    // "notebook.source.organizeImports": "explicit"
+  },
+  "jupyter.debugJustMyCode": false,
+  "python.testing.pytestArgs": ["tests"],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true,
+  "files.exclude": {
+    "**/*.egg-info": true,
+    "**/htmlcov": true,
+    "**/~$*": true,
+    "**/.coverage.*": true,
+    "**/.venv": true
+  },
+  "python.analysis.autoFormatStrings": true,
+
+  "tailwindCSS.experimental.configFile": null,
+  "tailwindCSS.classAttributes": [
+    "class",
+    "className",
+    "ngClass",
+    "class:list",
+    "cls"
+  ],
+  "tailwindCSS.includeLanguages": {
+    "python": "html"
+  }
+}
