@@ -1,7 +1,7 @@
 [project]
 name = "xrun"
 version = "0.1.0"
-description = "Add your description here"
+description = "A lightweight, dependency-free tool to manage your scripts directly from pyproject.toml"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = ["tomli>=1; python_version<'3.11'"]
@@ -27,24 +27,17 @@ line-length = 100
 target-version = "py311"
 
 [tool.pytest.ini_options]
-addopts = "--cov src --cov-branch --cov-report term --cov-report html --basetemp=local"
+addopts = "--cov src --cov-branch --cov-report term --cov-report html"
 
 [tool.xrun]
-source = """
-# Build and render documentation
-function doc() {
-    echo "Rendering documentation..."
-}
-
-# Rebuild docker image
-function docker_build() {
-    echo "Building Docker image..."
-}
-
-function say() {
-    echo "$1"
-}
+# Run tests with coverage
+test = """
+uv run ruff check
+uv run pytest --inline-snapshot=review
 """
 
-# Say something nice
-foo = 'say'
+# Publish pypi package
+publish = "rm -rf dist && uv build && uvx twine upload dist/*"
+
+# Open Cov report
+cov = "open htmlcov/index.html"

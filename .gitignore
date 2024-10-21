@@ -6,6 +6,7 @@ __pycache__
 .coverage
 htmlcov
 dist
+.coverage
 
 docs/.quarto
 docs/_site

@@ -25,6 +25,10 @@ class BashFunction:
             return NotImplemented
         return self.name == other.name and self.code == other.code and self.doc == other.doc
 
+    @property
+    def hidden(self):
+        return self.name.endswith("_") or self.name.startswith("_")
+
 
 @dataclass
 class XRunConfig:
@@ -79,9 +83,12 @@ def parse_cfg(pyproject_path) -> XRunConfig:
         with open(pyproject_path, "r") as f:
             lines = f.readlines()
         for k, v in cfg.items():
-            doc = None
-            for i, line in enumerate(lines):
-                if line.startswith(f"{k} = ") and i > 0 and lines[i - 1].startswith("#"):
-                    doc = lines[i - 1].strip().lstrip("#").strip()
-            functions.append(BashFunction(name=k, code=v, doc=doc))
+            functions.append(BashFunction(name=k, code=v, doc=_find_doc(lines, k)))
     return XRunConfig(script=script, functions=functions)
+
+
+def _find_doc(lines, func_name):
+    for i, line in enumerate(lines):
+        if line.startswith(f"{func_name} = ") and i > 0 and lines[i - 1].startswith("#"):
+            return lines[i - 1].strip().lstrip("#").strip()
+    return None

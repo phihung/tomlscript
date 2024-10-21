@@ -32,6 +32,7 @@ def _parse_args(argv):
         default="pyproject.toml",
         help="Path to pyproject.toml (default is current directory)",
     )
+    parser.add_argument("--debug", nargs="?", const=False, help="Run in debug mode")
     parser.add_argument("args", nargs=argparse.REMAINDER, default=[])
 
     return parser.parse_args(argv)
@@ -49,14 +50,18 @@ def _run(args):
 
     if args.function:
         if script := _get_script(cfg, args.function, args.args):
-            # print(script)
+            if args.debug:
+                print("---")
+                print(script)
+                print("---")
             _execute(script)
         else:
             sys.stderr.write(f"Error: Function '{args.function}' not found.")
             return 1
     else:
         for x in cfg.functions:
-            print(f"\033[92m{x.name:15s}\033[0m: {x.doc or ''}")
+            if not x.hidden:
+                print(f"\033[92m{x.name:15s}\033[0m: {x.doc or ''}")
         return 0
 
 

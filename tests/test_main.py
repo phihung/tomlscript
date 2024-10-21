@@ -17,30 +17,35 @@ def test_list_commands(capfd, pyproject):
 
 def test_run_command(capfd, pyproject):
     _main(["-c", str(pyproject), "foo"])
-    out, err = capfd.readouterr()
-    assert out.strip() == "111"
-    assert err == ""
+    check_outerr(capfd, "111")
 
 
 def test_run_command_with_args(capfd, pyproject):
     _main(["-c", str(pyproject), "bar", "hello 'world'"])
+    check_outerr(capfd, "hello 'world'")
+
+
+def test_run_command_with_debug(capfd, pyproject):
+    _main(["-c", str(pyproject), "--debug", "1", "bar", "hello 'world'"])
     out, err = capfd.readouterr()
-    assert out.strip() == "hello 'world'"
+    assert out == snapshot("""\
+---
+
+echo "hello 'world'"
+---
+hello 'world'
+""")
     assert err == ""
 
 
 def test_run_command_unknown(capfd, pyproject):
     _main(["-c", str(pyproject), "unknown"])
-    out, err = capfd.readouterr()
-    assert out == ""
-    assert err.strip() == snapshot("Error: Function 'unknown' not found.")
+    check_outerr(capfd, "", snapshot("Error: Function 'unknown' not found."))
 
 
 def test_run_command_config_not_exists(capfd):
     _main(["-c", "blah.toml"])
-    out, err = capfd.readouterr()
-    assert out == ""
-    assert err.strip() == snapshot("Error: blah.toml file not found.")
+    check_outerr(capfd, "", snapshot("Error: blah.toml file not found."))
 
 
 def test_version(capfd):
@@ -49,9 +54,7 @@ def test_version(capfd):
         assert False
     except SystemExit as e:
         assert e.code == 0
-        out, err = capfd.readouterr()
-        assert out.strip() == f"xrun {__version__}"
-        assert err == ""
+        check_outerr(capfd, f"xrun {__version__}")
 
 
 @pytest.fixture
@@ -59,8 +62,14 @@ def pyproject(tmp_path):
     pyproject = tmp_path / "pyproject.toml"
     pyproject.write_text("""
 [tool.xrun]
-bar = 'echo "$1"'
+bar = 'echo'
 # foo-doc
 foo = "echo 111"
 """)
     yield pyproject
+
+
+def check_outerr(capfd, out, err=""):
+    out_, err_ = capfd.readouterr()
+    assert out_.strip() == out
+    assert err_ == err
