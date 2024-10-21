@@ -1,4 +1,7 @@
+import importlib
+import os
 import re
+import sys
 from dataclasses import dataclass
 from typing import List, Optional
 
@@ -7,21 +10,20 @@ try:
 except ImportError:
     import tomli as tomllib
 
-
 SCRIPT = "source"
 
 
-class BashFunction:
+class Function:
     def __init__(self, name: str, code: Optional[str] = None, doc: Optional[str] = None):
         self.name = name
         self.code = code or name
         self.doc = doc
 
     def __repr__(self):  # pragma: no cover
-        return f"BashFunction(name={self.name!r}, code={self.code!r}, doc={self.doc!r})"
+        return f"Function(name={self.name!r}, code={self.code!r}, doc={self.doc!r})"
 
     def __eq__(self, other):
-        if not isinstance(other, BashFunction):  # pragma: no cover
+        if not isinstance(other, Function):  # pragma: no cover
             return NotImplemented
         return self.name == other.name and self.code == other.code and self.doc == other.doc
 
@@ -29,13 +31,30 @@ class BashFunction:
     def hidden(self):
         return self.name.endswith("_") or self.name.startswith("_")
 
+    @property
+    def is_pyfunc(self):
+        if len(self.code) > 100 or "\n" in self.code or ":" not in self.code:
+            return False
+        parts = self.code.split(":")
+        if len(parts) != 2:
+            return False
+        if os.getcwd() not in sys.path:
+            sys.path.append(os.getcwd())
+        try:
+            module = importlib.import_module(parts[0])
+        except ImportError:
+            return False
+        if hasattr(module, parts[1]):
+            return True
+        return False
+
 
 @dataclass
 class XRunConfig:
     script: str | None
-    functions: list[BashFunction]
+    functions: list[Function]
 
-    def get(self, name) -> BashFunction:
+    def get(self, name) -> Function:
         for x in self.functions:
             if x.name == name:
                 return x
@@ -51,7 +70,7 @@ patterns_func_with_comment = re.compile(
 pattern_func = re.compile(r"\s*(function )?\s*(?P<func>[a-zA-Z\-_0-9]+)\(\)\s*{")
 
 
-def _extract_functions(script: str) -> List[BashFunction]:
+def _extract_functions(script: str) -> List[Function]:
     """Extract bash function names and documentation from the bash script."""
     functions = []
 
@@ -59,14 +78,14 @@ def _extract_functions(script: str) -> List[BashFunction]:
     for match in patterns_func_with_comment.finditer(script):
         func_name = match.group("func")
         doc = match.group("doc")
-        functions.append(BashFunction(name=func_name, doc=doc))
+        functions.append(Function(name=func_name, doc=doc))
 
     # Then, find all functions without comments
     all_functions = {f.name for f in functions}  # Track functions with comments to avoid duplicates
     for match in pattern_func.finditer(script):
         func_name = match.group("func")
         if func_name not in all_functions:
-            functions.append(BashFunction(name=func_name))
+            functions.append(Function(name=func_name))
 
     return functions
 
@@ -83,7 +102,7 @@ def parse_cfg(pyproject_path) -> XRunConfig:
         with open(pyproject_path, "r") as f:
             lines = f.readlines()
         for k, v in cfg.items():
-            functions.append(BashFunction(name=k, code=v, doc=_find_doc(lines, k)))
+            functions.append(Function(name=k, code=v, doc=_find_doc(lines, k)))
     return XRunConfig(script=script, functions=functions)
 
 

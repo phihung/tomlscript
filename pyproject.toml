@@ -11,7 +11,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project.scripts]
-xrun = "tomlscript.main:main"
+tom = "tomlscript.main:main"
+tomlscript = "tomlscript.main:main"
 
 [tool.uv]
 dev-dependencies = [
@@ -41,3 +42,6 @@ publish = "rm -rf dist && uv build && uvx twine upload dist/*"
 
 # Open Cov report
 cov = "open htmlcov/index.html"
+
+# Execute a simple python function
+example = "tests.myscript:run1"

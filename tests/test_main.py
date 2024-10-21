@@ -1,3 +1,5 @@
+import subprocess
+
 import pytest
 from inline_snapshot import snapshot
 
@@ -6,40 +8,76 @@ from tomlscript.main import _main, main
 
 
 def test_list_commands(capfd, pyproject):
-    _main(["-c", str(pyproject)])
+    _main(["-c", pyproject])
     captured = capfd.readouterr()
     assert captured.out == snapshot("""\
 \x1b[92mbar            \x1b[0m: 
 \x1b[92mfoo            \x1b[0m: foo-doc
+\x1b[92mpyfunc1        \x1b[0m: 
+\x1b[92mpyfunc2        \x1b[0m: Say hello
 """)
     assert captured.err == ""
 
 
 def test_run_command(capfd, pyproject):
-    _main(["-c", str(pyproject), "foo"])
+    _main(["-c", pyproject, "foo"])
     check_outerr(capfd, "111")
 
 
 def test_run_command_with_args(capfd, pyproject):
-    _main(["-c", str(pyproject), "bar", "hello 'world'"])
+    _main(["-c", pyproject, "bar", "hello 'world'"])
     check_outerr(capfd, "hello 'world'")
 
 
 def test_run_command_with_debug(capfd, pyproject):
-    _main(["-c", str(pyproject), "--debug", "1", "bar", "hello 'world'"])
+    _main(["-c", pyproject, "--debug", "1", "bar", "hello 'world'"])
     out, err = capfd.readouterr()
     assert out == snapshot("""\
 ---
-
 echo "hello 'world'"
 ---
 hello 'world'
 """)
     assert err == ""
 
+    _main(["-c", pyproject, "--debug", "1", "pyfunc1"])
+    check_outerr(
+        capfd,
+        snapshot("""\
+---
+tests.myscript:run1()
+---
+Execute run1\
+"""),
+    )
+
+    _main(["-c", pyproject, "--debug", "1", "pyfunc2", "--name", "Paul"])
+    check_outerr(
+        capfd,
+        snapshot("""\
+---
+tests.myscript:run2(name='Paul', value=3.14)
+---
+Hello Paul. The value is 3.14\
+"""),
+    )
+
+
+def test_run_python(capfd, pyproject):
+    _main(["-c", pyproject, "pyfunc1"])
+    check_outerr(capfd, "Execute run1")
+
+    _main(["-c", pyproject, "pyfunc2", "--name", "Jean"])
+    check_outerr(capfd, "Hello Jean. The value is 3.14")
+
+
+def test_run_python_cwd(capfd, pyproject):
+    o = subprocess.check_output(["tom", "-c", pyproject, "pyfunc1"])
+    assert "Execute run1" == o.decode().strip()
+
 
 def test_run_command_unknown(capfd, pyproject):
-    _main(["-c", str(pyproject), "unknown"])
+    _main(["-c", pyproject, "unknown"])
     check_outerr(capfd, "", snapshot("Error: Function 'unknown' not found."))
 
 
@@ -65,11 +103,16 @@ def pyproject(tmp_path):
 bar = 'echo'
 # foo-doc
 foo = "echo 111"
+
+pyfunc1 = "tests.myscript:run1"
+                         
+# Say hello
+pyfunc2 = "tests.myscript:run2"
 """)
-    yield pyproject
+    yield str(pyproject)
 
 
 def check_outerr(capfd, out, err=""):
     out_, err_ = capfd.readouterr()
-    assert out_.strip() == out
     assert err_ == err
+    assert out_.strip() == out

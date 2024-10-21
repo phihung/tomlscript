@@ -15,6 +15,7 @@ def test_example_1(tmp_path, capfd):
     assert out == snapshot("""\
 \x1b[92mdev            \x1b[0m: Start dev server
 \x1b[92mpublish        \x1b[0m: Publish to PyPI
+\x1b[92mpyi            \x1b[0m: Generate pyi stubs (python function)
 """)
     assert err == ""
 
@@ -29,6 +30,7 @@ def test_example_2(tmp_path, capfd):
         snapshot("""\
 \x1b[92mdoc            \x1b[0m: Documentation for `doc` function
 \x1b[92mhello          \x1b[0m: This line is the documentation for `hello` function
+\x1b[92mrun2           \x1b[0m: Run python function run2 from tests.myscript module
 \x1b[92mtest           \x1b[0m: Lint and test\
 """),
     )

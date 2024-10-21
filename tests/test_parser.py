@@ -1,6 +1,6 @@
 from inline_snapshot import snapshot
 
-from tomlscript.parser import BashFunction, parse_cfg
+from tomlscript.parser import Function, parse_cfg
 
 
 def test_parse_cfg(tmp_path):
@@ -26,9 +26,9 @@ source = '''
     out = parse_cfg(cfg_file)
     assert out.functions == snapshot(
         [
-            BashFunction(name="say", code="say", doc="Say somethings"),
-            BashFunction(name="bar", code="bar", doc=None),
-            BashFunction(name="foo", code="say 'FOO'", doc=None),
+            Function(name="say", code="say", doc="Say somethings"),
+            Function(name="bar", code="bar", doc=None),
+            Function(name="foo", code="say 'FOO'", doc=None),
         ]
     )
     assert out.script.strip() == src.strip()
@@ -49,8 +49,8 @@ bar = "say 'BAR'"
     out = parse_cfg(cfg_file)
     assert out.functions == snapshot(
         [
-            BashFunction(name="foo", code="say 'FOO'", doc=None),
-            BashFunction(name="bar", code="say 'BAR'", doc="super bar"),
+            Function(name="foo", code="say 'FOO'", doc=None),
+            Function(name="bar", code="say 'BAR'", doc="super bar"),
         ]
     )
     assert out.script is None

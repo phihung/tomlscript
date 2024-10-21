@@ -1,26 +1,29 @@
-# XRUN
+# Tomlscript
 
 A lightweight, dependency-free tool to manage your scripts directly from pyproject.toml
 
 <div style="display: flex; justify-content: space-between;align-items: center;">
-  <div style="width: 40%;">
+  <div style="width: 30%;">
 
 **Usage**
 
 ```bash
 # List commands
-xrun
+tom
 
 # Run a command
-xrun publish
-xrun dev
+tom publish
+tom dev
+tom pyi
+
+
 
 ```
 
   </div>
-  <div style="width: 55%;">
+  <div style="width: 65%;">
 
-**Example configuration**
+**Example Configuration**
 
 ```toml
 # pyproject.toml
@@ -30,6 +33,9 @@ dev = "uv run uvicorn --port 5001 superapp.main:app --reload"
 
 # Publish to PyPI
 publish = "rm -rf dist && uv build && uvx twine upload dist/*"
+
+# Generate pyi stubs (python function)
+pyi = "mypackage.typing:generate_pyi"
 ```
 
   </div>
@@ -47,19 +53,20 @@ uv add --dev tomlscript
 **Directly**
 
 ```bash
-xrun
-xrun function
-xrun function arg1 --k2 v2
+# alias tom = "uv run tom"
+tom
+tom function
+tom function arg1 --k2 v2
 ```
 
 **Using uv / uvx**
 
 ```bash
-uvx xrun
-uvx xrun function arg1 --k2 v2
+uvx tomlscript
+uvx tomlscript function arg1 --k2 v2
 
-uv run xrun
-uv run xrun function arg1 --k2 v2
+uv run tom
+uv run tom function arg1 --k2 v2
 ```
 
 ## Configuration
@@ -70,6 +77,9 @@ For real world examples, see [pyproject.toml](./pyproject.toml) file.
 [tool.tomlscript]
 # This line is the documentation for `hello` function
 hello = 'say_ "Hello world"'
+
+# Run python function run2 from tests.myscript module
+run2 = "tests.myscript:run2"
 
 # Lint and test
 test = """
@@ -89,4 +99,15 @@ say_() {
   echo "$1"
 }
 """
+```
+
+## Development
+
+```bash
+# Install dependencies
+uv sync
+alias tom="uv run tom"
+
+# List the commands
+tom
 ```

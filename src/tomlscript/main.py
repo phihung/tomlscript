@@ -1,12 +1,13 @@
 import argparse
+import importlib
 import os
 import subprocess
 import sys
 import tempfile
-from typing import Optional
 
 from tomlscript import __version__
-from tomlscript.parser import XRunConfig, parse_cfg
+from tomlscript.parser import Function, XRunConfig, parse_cfg
+from tomlscript.utils import parse_args
 
 
 def main(argv=sys.argv[1:]):
@@ -49,12 +50,11 @@ def _run(args):
     cfg = parse_cfg(args.config)
 
     if args.function:
-        if script := _get_script(cfg, args.function, args.args):
-            if args.debug:
-                print("---")
-                print(script)
-                print("---")
-            _execute(script)
+        if func := cfg.get(args.function):
+            if func.is_pyfunc:
+                _execute_python(cfg, func, args.args, debug=args.debug)
+            else:
+                _execute_shell(cfg, func, args.args, debug=args.debug)
         else:
             sys.stderr.write(f"Error: Function '{args.function}' not found.")
             return 1
@@ -65,19 +65,38 @@ def _run(args):
         return 0
 
 
-def _get_script(cfg: XRunConfig, function: str, args: list[str]) -> Optional[str]:
-    if func := cfg.get(function):
-        args = [repr(x) for x in args]
-        return "".join([cfg.script or "", "\n", func.code, " ", " ".join(args)])
-    return None
+def _execute_shell(cfg: XRunConfig, func: Function, args: list[str], debug: bool = False):
+    args = [repr(x) for x in args]
+    script = "".join([cfg.script or "", "\n", func.code, " ", " ".join(args)])
 
+    if debug:
+        print("---", script.strip(), "---", sep="\n")
 
-def _execute(script):
     """Execute the specified function from the shell script."""
     with tempfile.NamedTemporaryFile(mode="w", delete=False) as fd:
         fd.write(script)
 
     subprocess.run(["bash", fd.name])
+
+
+def _execute_python(cfg: XRunConfig, func: Function, args: list[str], debug: bool = False):
+    module_name, func_name = func.code.split(":")
+    module = importlib.import_module(module_name)
+    pyfunc = getattr(module, func_name)
+    if not args:
+        if debug:
+            print("---", f"{func.code}()", "---", sep="\n")
+        pyfunc()
+    else:
+        func_args = parse_args(pyfunc, args)
+        if debug:
+            print(
+                "---",
+                f"{func.code}({', '.join(f'{k}={v!r}' for k, v in func_args.items())})",
+                "---",
+                sep="\n",
+            )
+        pyfunc(**func_args)
 
 
 if __name__ == "__main__":  # pragma: no cover
