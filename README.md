@@ -8,6 +8,7 @@ A lightweight, dependency-free tool to manage your scripts directly from pyproje
 **Usage**
 
 ```bash
+# alias tom = "uvx tomlscript"
 # List commands
 tom
 
@@ -15,7 +16,6 @@ tom
 tom publish
 tom dev
 tom pyi
-
 
 
 ```
@@ -53,7 +53,7 @@ uv add --dev tomlscript
 **Directly**
 
 ```bash
-# alias tom = "uv run tom"
+# alias tom = "uvx tomlscript"
 tom
 tom function
 tom function arg1 --k2 v2

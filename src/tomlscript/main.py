@@ -20,9 +20,7 @@ def _main(argv):
 
 
 def _parse_args(argv):
-    parser = argparse.ArgumentParser(
-        description="Execute functions from pyproject.toml [tool.xrun]"
-    )
+    parser = argparse.ArgumentParser(description="Execute functions from pyproject.toml")
     parser.add_argument("function", nargs="?", help="The function to execute")
     parser.add_argument(
         "-v", "--version", nargs="?", const=True, default=False, help="Print the current version"

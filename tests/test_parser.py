@@ -27,8 +27,8 @@ source = '''
     assert out.functions == snapshot(
         [
             Function(name="say", code="say", doc="Say somethings"),
-            Function(name="bar", code="bar", doc=None),
-            Function(name="foo", code="say 'FOO'", doc=None),
+            Function(name="bar", code="bar", doc="bar"),
+            Function(name="foo", code="say 'FOO'", doc="say 'FOO'"),
         ]
     )
     assert out.script.strip() == src.strip()
@@ -49,7 +49,7 @@ bar = "say 'BAR'"
     out = parse_cfg(cfg_file)
     assert out.functions == snapshot(
         [
-            Function(name="foo", code="say 'FOO'", doc=None),
+            Function(name="foo", code="say 'FOO'", doc="say 'FOO'"),
             Function(name="bar", code="say 'BAR'", doc="super bar"),
         ]
     )

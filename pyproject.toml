@@ -1,10 +1,13 @@
 [project]
 name = "tomlscript"
-version = "0.1.0"
+version = "0.1.1"
 description = "A lightweight, dependency-free tool to manage your scripts directly from pyproject.toml"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = ["tomli>=1; python_version<'3.11'"]
+
+[project.urls]
+"Source" = "https://github.com/phihung/tomlscript"
 
 [build-system]
 requires = ["hatchling"]

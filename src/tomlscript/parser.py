@@ -17,7 +17,7 @@ class Function:
     def __init__(self, name: str, code: Optional[str] = None, doc: Optional[str] = None):
         self.name = name
         self.code = code or name
-        self.doc = doc
+        self.doc = doc or _shorten(self.code)
 
     def __repr__(self):  # pragma: no cover
         return f"Function(name={self.name!r}, code={self.code!r}, doc={self.doc!r})"
@@ -44,9 +44,14 @@ class Function:
             module = importlib.import_module(parts[0])
         except ImportError:
             return False
-        if hasattr(module, parts[1]):
-            return True
-        return False
+        return hasattr(module, parts[1])
+
+
+def _shorten(x: str, n: int = 40) -> str:
+    x = x.replace("\n", " ")
+    if len(x) < n:
+        return x
+    return x[:n] + "..."
 
 
 @dataclass
