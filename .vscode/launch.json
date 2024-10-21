@@ -15,7 +15,7 @@
       "name": "Run",
       "type": "debugpy",
       "request": "launch",
-      "module": "xrun",
+      "module": "tomlscript",
       "args": [],
       "justMyCode": false
     }

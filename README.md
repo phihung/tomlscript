@@ -24,7 +24,7 @@ xrun dev
 
 ```toml
 # pyproject.toml
-[tool.xrun]
+[tool.tomlscript]
 # Start dev server
 dev = "uv run uvicorn --port 5001 superapp.main:app --reload"
 
@@ -38,8 +38,8 @@ publish = "rm -rf dist && uv build && uvx twine upload dist/*"
 ## Installation
 
 ```bash
-pip install xrun
-uv add --dev xrun
+pip install tomlscript
+uv add --dev tomlscript
 ```
 
 ## Running Commands
@@ -67,7 +67,7 @@ uv run xrun function arg1 --k2 v2
 For real world examples, see [pyproject.toml](./pyproject.toml) file.
 
 ```toml
-[tool.xrun]
+[tool.tomlscript]
 # This line is the documentation for `hello` function
 hello = 'say_ "Hello world"'
 
@@ -77,7 +77,7 @@ uv run ruff check
 uv run pytest --inline-snapshot=review
 """
 
-# Define multiple functions in the `[tool.xrun.source]` sections
+# Define multiple functions in the `[tool.tomlscript.source]` sections
 source = """
 # Documentation for `doc` function
 doc() {

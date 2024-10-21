@@ -1,5 +1,5 @@
 [project]
-name = "xrun"
+name = "tomlscript"
 version = "0.1.0"
 description = "A lightweight, dependency-free tool to manage your scripts directly from pyproject.toml"
 readme = "README.md"
@@ -11,7 +11,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project.scripts]
-xrun = "xrun.main:main"
+xrun = "tomlscript.main:main"
 
 [tool.uv]
 dev-dependencies = [
@@ -29,7 +29,7 @@ target-version = "py311"
 [tool.pytest.ini_options]
 addopts = "--cov src --cov-branch --cov-report term --cov-report html"
 
-[tool.xrun]
+[tool.tomlscript]
 # Run tests with coverage
 test = """
 uv run ruff check

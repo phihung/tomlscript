@@ -3,7 +3,7 @@ from pathlib import Path
 
 from inline_snapshot import snapshot
 
-from xrun.main import _main
+from tomlscript.main import _main
 
 
 def test_example_1(tmp_path, capfd):

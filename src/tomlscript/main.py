@@ -5,8 +5,8 @@ import sys
 import tempfile
 from typing import Optional
 
-from xrun import __version__
-from xrun.parser import XRunConfig, parse_cfg
+from tomlscript import __version__
+from tomlscript.parser import XRunConfig, parse_cfg
 
 
 def main(argv=sys.argv[1:]):

@@ -1,6 +1,6 @@
 from inline_snapshot import snapshot
 
-from xrun.parser import BashFunction, parse_cfg
+from tomlscript.parser import BashFunction, parse_cfg
 
 
 def test_parse_cfg(tmp_path):
@@ -16,7 +16,7 @@ function bar() {
 }
 """
     cfg_file.write_text(f"""
-[tool.xrun]
+[tool.tomlscript]
 foo = "say 'FOO'"
 
 source = '''
@@ -41,7 +41,7 @@ source = '''
 def test_parse_cfg_2(tmp_path):
     cfg_file = tmp_path / "test.toml"
     cfg_file.write_text("""
-[tool.xrun]
+[tool.tomlscript]
 foo = "say 'FOO'"
 # super bar
 bar = "say 'BAR'"

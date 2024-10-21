@@ -74,7 +74,7 @@ def _extract_functions(script: str) -> List[BashFunction]:
 def parse_cfg(pyproject_path) -> XRunConfig:
     """Parse the pyproject.toml file."""
     with open(pyproject_path, "rb") as f:
-        cfg = tomllib.load(f).get("tool", {}).get("xrun", {})
+        cfg = tomllib.load(f).get("tool", {}).get("tomlscript", {})
     script = cfg.pop(SCRIPT, None)
     functions = []
     if script:

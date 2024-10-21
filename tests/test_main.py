@@ -1,8 +1,8 @@
 import pytest
 from inline_snapshot import snapshot
 
-from xrun import __version__
-from xrun.main import _main, main
+from tomlscript import __version__
+from tomlscript.main import _main, main
 
 
 def test_list_commands(capfd, pyproject):
@@ -54,14 +54,14 @@ def test_version(capfd):
         assert False
     except SystemExit as e:
         assert e.code == 0
-        check_outerr(capfd, f"xrun {__version__}")
+        check_outerr(capfd, f"tomlscript {__version__}")
 
 
 @pytest.fixture
 def pyproject(tmp_path):
     pyproject = tmp_path / "pyproject.toml"
     pyproject.write_text("""
-[tool.xrun]
+[tool.tomlscript]
 bar = 'echo'
 # foo-doc
 foo = "echo 111"
