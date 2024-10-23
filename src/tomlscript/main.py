@@ -5,9 +5,8 @@ import subprocess
 import sys
 import tempfile
 
-from tomlscript import __version__
+from tomlscript import __version__, utils
 from tomlscript.parser import Function, XRunConfig, parse_cfg
-from tomlscript.utils import parse_args
 
 
 def main(argv=sys.argv[1:]):
@@ -64,17 +63,27 @@ def _run(args):
 
 
 def _execute_shell(cfg: XRunConfig, func: Function, args: list[str], debug: bool = False):
-    args = [repr(x) for x in args]
-    script = "".join([cfg.script or "", "\n", func.code, " ", " ".join(args)])
+    variables = func.variables
+    if variables:
+        code = utils.resolve_template(func.code, func.variables, args)
+    else:
+        args = [repr(x) for x in args]
+        code = func.code + " " + " ".join(args)
 
-    if debug:
-        print("---", script.strip(), "---", sep="\n")
+    if not cfg.script:
+        if debug:
+            print("---", code.strip(), "---", sep="\n")
+        subprocess.run(code, shell=True)
+    else:
+        script = "\n".join([cfg.script, code])
+        if debug:
+            print("---", script.strip(), "---", sep="\n")
 
-    """Execute the specified function from the shell script."""
-    with tempfile.NamedTemporaryFile(mode="w", delete=False) as fd:
-        fd.write(script)
+        """Execute the specified function from the shell script."""
+        with tempfile.NamedTemporaryFile(mode="w", delete=False) as fd:
+            fd.write(script)
 
-    subprocess.run(["bash", fd.name])
+        subprocess.run(["bash", fd.name])
 
 
 def _execute_python(cfg: XRunConfig, func: Function, args: list[str], debug: bool = False):
@@ -86,7 +95,7 @@ def _execute_python(cfg: XRunConfig, func: Function, args: list[str], debug: boo
             print("---", f"{func.code}()", "---", sep="\n")
         pyfunc()
     else:
-        func_args = parse_args(pyfunc, args)
+        func_args = utils.parse_args(pyfunc, args)
         if debug:
             print(
                 "---",

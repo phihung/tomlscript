@@ -5,6 +5,8 @@ import sys
 from dataclasses import dataclass
 from typing import List, Optional
 
+from tomlscript import utils
+
 try:
     import tomllib
 except ImportError:
@@ -26,6 +28,10 @@ class Function:
         if not isinstance(other, Function):  # pragma: no cover
             return NotImplemented
         return self.name == other.name and self.code == other.code and self.doc == other.doc
+
+    @property
+    def variables(self) -> dict[str, str | None]:
+        return utils.extract_placeholders(self.code)
 
     @property
     def hidden(self):

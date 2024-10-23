@@ -10,3 +10,4 @@ dist
 
 docs/.quarto
 docs/_site
+.DS_Store

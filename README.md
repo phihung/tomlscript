@@ -13,8 +13,8 @@ A lightweight, dependency-free tool to manage your scripts directly from pyproje
 tom
 
 # Run a command
+tom dev --port 8000
 tom publish
-tom dev
 tom pyi
 
 
@@ -28,8 +28,8 @@ tom pyi
 ```toml
 # pyproject.toml
 [tool.tomlscript]
-# Start dev server
-dev = "uv run uvicorn --port 5001 superapp.main:app --reload"
+# Start dev server (default on port 5001)
+dev = "uv run uvicorn --port {port:5001} superapp.main:app --reload"
 
 # Publish to PyPI
 publish = "rm -rf dist && uv build && uvx twine upload dist/*"
@@ -71,6 +71,80 @@ uv run tom function arg1 --k2 v2
 
 ## Configuration
 
+### Basic
+
+Commands are defined in the `[tool.tomlscript]` section of the `pyproject.toml` file.
+
+The comment above a command serves as its documentation.
+
+```toml
+[tool.tomlscript]
+# Linter check <= this line is the documentation for `lint` command
+lint = "uv run ruff check"
+```
+
+Commands can be multi-line scripts:
+
+```toml
+[tool.tomlscript]
+# Lint and test
+test = """
+uv run ruff check
+uv run pytest
+"""
+```
+
+You can define commands with arguments using the `{arg}` or `{arg:default}` syntax:
+
+```toml
+[tool.tomlscript]
+# Start dev server (default on port 5001)
+dev = "uv run uvicorn --port {port:5001} superapp.main:app --reload"
+```
+
+The above command can be used as
+
+```bash
+tom dev              # run on port 5001
+tom dev --port 8000  # run on port 8000
+```
+
+You can also define commands as Python functions using the `module:function` syntax:
+
+```toml
+[tool.tomlscript]
+# Run python function run2 from [tests.myscript module](./tests/myscript.py)
+py_example = "tests.myscript:run2"
+```
+
+Arguments can be passed to Python functions:
+
+```bash
+tom py_example --name Paul
+```
+
+For complex shell scripts, you can use the `[tool.tomlscript.source]` section. Functions defined here can be reused across multiple commands:
+
+```toml
+[tool.tomlscript]
+build = "clean && uv build"
+
+source = """
+# Clean up
+clean() {
+  say_ "Cleaning up..."
+  rm -rf dist .eggs *.egg-info build
+}
+
+# Functions ending with _ are hidden from the command list
+say_() {
+  echo "$1"
+}
+"""
+```
+
+### Full example
+
 For real world examples, see [pyproject.toml](./pyproject.toml) file.
 
 ```toml
@@ -80,6 +154,9 @@ hello = 'say_ "Hello world"'
 
 # Run python function run2 from tests.myscript module
 run2 = "tests.myscript:run2"
+
+# A command with arguments and default values
+dev = "uv run uvicorn --port {port:5001} superapp.main:app"
 
 # Lint and test
 test = """
@@ -94,7 +171,7 @@ doc() {
   say_ "Rendering documentation..."
 }
 
-# Functions end with _ will not show in the list
+# Functions ending with _ are hidden from the command list
 say_() {
   echo "$1"
 }

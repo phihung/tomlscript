@@ -17,6 +17,7 @@ def test_list_commands(capfd, pyproject):
 \x1b[92mdev            \x1b[0m: uv run uvicorn --port 5001 superapp.main...
 \x1b[92mpyfunc1        \x1b[0m: tests.myscript:run1
 \x1b[92mpyfunc2        \x1b[0m: Say hello
+\x1b[92msayhi          \x1b[0m: echo 'Hi {name}. How are you? Are you fr...
 """)
     assert captured.err == ""
 
@@ -109,6 +110,18 @@ def test_help(capfd):
         assert "functions" in capfd.readouterr().out
 
 
+def test_run_command_with_args_and_template(capfd, pyproject):
+    _main(["-c", pyproject, "sayhi", "--name", "Paul"])
+    check_outerr(capfd, snapshot("Hi Paul. How are you? Are you from Viet Nam?"))
+
+    _main(["-c", pyproject, "sayhi", "--country", "France", "--name", "Paul"])
+    check_outerr(capfd, snapshot("Hi Paul. How are you? Are you from France?"))
+
+    with pytest.raises(SystemExit):
+        _main(["-c", pyproject, "sayhi", "--country", "US"])
+        check_outerr(capfd, "", snapshot("Error: Missing option '--name'."))
+
+
 @pytest.fixture
 def pyproject(tmp_path):
     pyproject = tmp_path / "pyproject.toml"
@@ -125,6 +138,8 @@ pyfunc1 = "tests.myscript:run1"
                          
 # Say hello
 pyfunc2 = "tests.myscript:run2"
+                         
+sayhi = "echo 'Hi {name}. How are you? Are you from {country:Viet Nam}?'"
 """)
     yield str(pyproject)
 

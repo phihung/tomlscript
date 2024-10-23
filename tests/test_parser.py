@@ -1,3 +1,4 @@
+import pytest
 from inline_snapshot import snapshot
 
 from tomlscript.parser import Function, parse_cfg
@@ -44,13 +45,13 @@ def test_parse_cfg_2(tmp_path):
 [tool.tomlscript]
 foo = "say 'FOO'"
 # super bar
-bar = "say 'BAR'"
+bar = "say '{msg: BAR }'"
 """)
     out = parse_cfg(cfg_file)
     assert out.functions == snapshot(
         [
             Function(name="foo", code="say 'FOO'", doc="say 'FOO'"),
-            Function(name="bar", code="say 'BAR'", doc="super bar"),
+            Function(name="bar", code="say '{msg: BAR }'", doc="super bar"),
         ]
     )
     assert out.script is None
@@ -62,3 +63,19 @@ def test_parse_cfg_3(tmp_path):
     out = parse_cfg(cfg_file)
     assert out.functions == []
     assert out.script is None
+
+
+@pytest.mark.parametrize(
+    "code,exp",
+    [
+        ("say 'FOO'", {}),
+        ("say '{msg: FOO }'", {"msg": " FOO "}),
+        ("say '{msg:a:b:c}'", {"msg": "a:b:c"}),
+        ("uvicorn run main:app --port {port}", {"port": None}),
+        ("uvicorn run main:app --port {port:1234}", {"port": "1234"}),
+        ("uvicorn run main:app --reload {reload:1} --port {port}", {"port": None, "reload": "1"}),
+    ],
+)
+def test_variables(code, exp):
+    func = Function(name="foo", code=code)
+    assert func.variables == exp
