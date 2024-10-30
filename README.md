@@ -46,6 +46,12 @@ pyi = "mypackage.typing:generate_pyi"
 ```bash
 pip install tomlscript
 uv add --dev tomlscript
+
+# Or better, run it directly with uvx without installation
+# And use it to setup other dependencies
+alias tom = "uvx tomlscript"
+tom # List commands
+tom setup_dev  # Run command to setup dev env
 ```
 
 ## Running Commands
@@ -56,17 +62,14 @@ uv add --dev tomlscript
 # alias tom = "uvx tomlscript"
 tom
 tom function
-tom function arg1 --k2 v2
+tom function v1 --arg2 v2
 ```
 
-**Using uv / uvx**
+**Using uv**
 
 ```bash
-uvx tomlscript
-uvx tomlscript function arg1 --k2 v2
-
 uv run tom
-uv run tom function arg1 --k2 v2
+uv run tom function v1 --arg2 v2
 ```
 
 ## Configuration
@@ -145,7 +148,7 @@ say_() {
 
 ### Full example
 
-For real world examples, see [pyproject.toml](./pyproject.toml) file.
+For real world examples, see [development section](#development) and [pyproject.toml](./pyproject.toml) file.
 
 ```toml
 [tool.tomlscript]
@@ -181,10 +184,14 @@ say_() {
 ## Development
 
 ```bash
-# Install dependencies
-uv sync
-alias tom="uv run tom"
-
-# List the commands
+alias tom="uvx tomlscript"
 tom
+# setup_dev      : Setup dev env
+# test           : Run tests with coverage
+# publish        : Publish pypi package
+# cov            : Open Cov report
+# example        : Execute a simple python function
+
+# Setup dev enviroment
+tom setup_dev
 ```

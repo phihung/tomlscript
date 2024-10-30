@@ -1,6 +1,6 @@
 [project]
 name = "tomlscript"
-version = "0.2.0"
+version = "0.2.1"
 description = "A lightweight, dependency-free tool to manage your scripts directly from pyproject.toml"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -34,6 +34,13 @@ target-version = "py311"
 addopts = "--cov src --cov-branch --cov-report term --cov-report html"
 
 [tool.tomlscript]
+# Setup dev env
+setup_dev = """
+uv sync
+uv run ruff check
+uv run pytest
+"""
+
 # Run tests with coverage
 test = """
 uv run ruff check

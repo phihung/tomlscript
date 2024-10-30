@@ -95,7 +95,7 @@ def _execute_python(cfg: XRunConfig, func: Function, args: list[str], debug: boo
             print("---", f"{func.code}()", "---", sep="\n")
         pyfunc()
     else:
-        func_args = utils.parse_args(pyfunc, args)
+        func_args = utils.parse_args_for_python(pyfunc, args)
         if debug:
             print(
                 "---",
