@@ -1,5 +1,7 @@
 # Tomlscript
 
+[![codecov](https://codecov.io/gh/phihung/tomlscript/branch/main/graph/badge.svg)](https://codecov.io/gh/phihung/tomlscript)
+
 A lightweight, dependency-free tool to manage your scripts directly from pyproject.toml
 
 <div style="display: flex; justify-content: space-between;align-items: center;">
