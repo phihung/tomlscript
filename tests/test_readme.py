@@ -8,57 +8,32 @@ from tomlscript.main import _main
 
 
 @patch("subprocess.run")
-def test_example_1(mock, tmp_path, capfd):
-    block = get_toml_blocks_from_readme("publish")
+def test_readme_example_1(mock, tmp_path, capfd):
+    block = get_toml_blocks_from_readme("Start dev server")
     fn = tmp_path / "pyproject.toml"
     fn.write_text(block)
 
     _main(["-c", str(fn)])
     check_outerr(
         capfd,
-        snapshot("""\
-\x1b[92mdev            \x1b[0m: Start dev server (default on port 5001)
-\x1b[92mpublish        \x1b[0m: Publish to PyPI
-\x1b[92mpyi            \x1b[0m: Generate pyi stubs (python function)\
-"""),
+        snapshot(
+            """\
+\x1b[92mdev            \x1b[0m: Start dev server
+\x1b[92mtest           \x1b[0m: Run tests\
+"""
+        ),
     )
 
     _main(["-c", str(fn), "dev"])
     mock.assert_called_once_with(
-        "uv run uvicorn --port 5001 superapp.main:app --reload", shell=True
+        "uv run uvicorn --port 5000 superapp.main:app --reload", shell=True
     )
 
     mock.reset_mock()
-    _main(["-c", str(fn), "dev", "--port", "8000"])
+    _main(["-c", str(fn), "dev", "--port", "8001"])
     mock.assert_called_once_with(
-        "uv run uvicorn --port 8000 superapp.main:app --reload", shell=True
+        "uv run uvicorn --port 8001 superapp.main:app --reload", shell=True
     )
-
-
-def test_example_2(tmp_path, capfd):
-    block = get_toml_blocks_from_readme("Rendering documentation")
-    fn = tmp_path / "pyproject.toml"
-    fn.write_text(block)
-    _main(["-c", str(fn)])
-    check_outerr(
-        capfd,
-        snapshot("""\
-\x1b[92mdoc            \x1b[0m: Documentation for `doc` function
-\x1b[92mhello          \x1b[0m: This line is the documentation for `hello` function
-\x1b[92mrun2           \x1b[0m: Run python function run2 from tests.myscript module
-\x1b[92mdev            \x1b[0m: A command with arguments and default values
-\x1b[92mtest           \x1b[0m: Lint and test\
-"""),
-    )
-
-    _main(["-c", str(fn), "hello"])
-    check_outerr(capfd, "Hello world")
-
-    _main(["-c", str(fn), "doc"])
-    check_outerr(capfd, "Rendering documentation...")
-
-    _main(["-c", str(fn), "--debug", "1", "doc"])
-    assert "Rendering documentation..." in capfd.readouterr().out
 
 
 def test_all(tmp_path, capfd):

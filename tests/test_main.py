@@ -40,6 +40,10 @@ def test_run_command_with_debug(capfd, pyproject):
     out, err = capfd.readouterr()
     assert out == snapshot("""\
 ---
+say_() {
+  echo "$1"
+}
+
 echo "hello 'world'"
 ---
 hello 'world'
@@ -140,6 +144,12 @@ pyfunc1 = "tests.myscript:run1"
 pyfunc2 = "tests.myscript:run2"
                          
 sayhi = "echo 'Hi {name}. How are you? Are you from {country:Viet Nam}?'"
+                         
+source = '''
+say_() {
+  echo "$1"
+}
+'''
 """)
     yield str(pyproject)
 

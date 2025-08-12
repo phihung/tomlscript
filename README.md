@@ -4,8 +4,6 @@
 
 **Run and manage project scripts straight from `pyproject.toml` — no extra dependencies, no fuss.**
 
-Define commands once, run them anywhere with `tom`.
-
 ---
 
 ## 🚀 Quick Example
@@ -36,16 +34,6 @@ tom                  # list all commands
 ```
 
 Done. No custom scripts folder, no Makefile, no shell-specific quirks.
-
----
-
-## 💡 Why Tomlscript?
-
-* **One source of truth** — commands live in `pyproject.toml`.
-* **No global install** — run with `uvx` or `pip install`.
-* **Shell or Python** — call shell commands or Python functions.
-* **Arguments & defaults** — `{arg}` / `{arg:default}` syntax.
-* **Reusable snippets** — define helper functions once, use anywhere.
 
 ---
 
@@ -110,5 +98,3 @@ tom setup_dev   # setup dev environment
 tom test        # run tests with coverage
 tom publish     # build + upload to PyPI
 ```
-
-
